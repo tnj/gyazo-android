@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,6 +33,7 @@ public class ImageUploadService extends IntentService {
 
     private static final String TAG = "ImageUploadService";
     public static final String PREFS_GYAZO_ID = "id";
+    public static final int WAIT_FOR_SAVE_COMPLETION_SECONDS = 10;
 
     private Handler handler;
 
@@ -45,13 +47,18 @@ public class ImageUploadService extends IntentService {
         Uri uri = intent.getData();
 
         onStart();
+
+        int retry = 3;
         String result = null;
-        try {
-            result = upload(uri);
-        } catch (IOException e) {
-            Log.w(TAG, "Failed to upload an image", e);
-            DeployGate.logWarn("Failed to upload: " + e.getMessage());
-        }
+        do {
+            try {
+                result = upload(uri);
+                break;
+            } catch (IOException e) {
+                Log.w(TAG, String.format("Failed to upload an image retry = %d", retry), e);
+                DeployGate.logWarn("Failed to upload: " + e.getMessage());
+            }
+        } while (--retry > 0);
 
         if (result == null) {
             onFailed();
@@ -95,7 +102,7 @@ public class ImageUploadService extends IntentService {
 
         String id = loadGyazoId();
         String type = getContentResolver().getType(uri);
-        File file = getFileFromContentUri(uri);
+        File file = ensureFileFromContentUri(uri);
 
         RequestBody body = new MultipartBuilder()
                 .type(MultipartBuilder.FORM)
@@ -144,15 +151,36 @@ public class ImageUploadService extends IntentService {
         return "http://upload.gyazo.com/upload.cgi";
     }
 
+    @Nullable
+    private File ensureFileFromContentUri(Uri uri) {
+        File file;
+        int retry = WAIT_FOR_SAVE_COMPLETION_SECONDS;
+        do {
+            file = getFileFromContentUri(uri);
+            if (file != null)
+                break;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                break;
+            }
+        } while (--retry > 0);
+        return file;
+    }
+
+    @Nullable
     public File getFileFromContentUri(Uri uri) {
         Cursor cursor = getContentResolver().query(uri,
                 new String[]{
                         MediaStore.Images.ImageColumns.DATA,
+                        MediaStore.Images.ImageColumns.SIZE
                 }, null, null, null);
         if (cursor != null) {
             try {
                 if (cursor.moveToFirst()) {
-                    return new File(cursor.getString(0));
+                    // SIZE == 0 means image compression haven't finished yet
+                    if (cursor.getLong(1) > 0)
+                        return new File(cursor.getString(0));
                 }
             } finally {
                 cursor.close();
