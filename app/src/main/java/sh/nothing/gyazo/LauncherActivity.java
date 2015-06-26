@@ -1,7 +1,6 @@
 package sh.nothing.gyazo;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,7 +9,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import java.io.File;
 
@@ -40,9 +38,6 @@ public class LauncherActivity extends Activity {
     }
 
     private void uploadScreenshot(Uri target) {
-        // TODO implement
-        Toast.makeText(this, target.toString(), Toast.LENGTH_LONG).show();;
-
         Intent i = new Intent(this, ImageUploadService.class);
         i.setData(target);
         startService(i);

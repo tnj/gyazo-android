@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -30,8 +32,11 @@ public class ImageUploadService extends IntentService {
     private static final String TAG = "ImageUploadService";
     public static final String PREFS_GYAZO_ID = "id";
 
+    private Handler handler;
+
     public ImageUploadService() {
         super(TAG);
+        handler = new Handler();
     }
 
     @Override
@@ -57,14 +62,26 @@ public class ImageUploadService extends IntentService {
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
+
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        clipboard.setText(url);
     }
 
     private void onFailed() {
-        Toast.makeText(this, R.string.failed_to_upload_image, Toast.LENGTH_LONG).show();
+        showToast(R.string.failed_to_upload_image, Toast.LENGTH_SHORT);
     }
 
     private void onStart() {
-        Toast.makeText(this, R.string.uploading_image, Toast.LENGTH_SHORT).show();
+        showToast(R.string.uploading_image, Toast.LENGTH_SHORT);
+    }
+
+    private void showToast(final int res, final int length) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ImageUploadService.this, res, length).show();
+            }
+        });
     }
 
     private String upload(final Uri uri) throws IOException {
@@ -137,4 +154,5 @@ public class ImageUploadService extends IntentService {
         }
         return null;
     }
+
 }
