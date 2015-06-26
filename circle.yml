@@ -13,7 +13,7 @@ test:
   override:
     - ./gradlew test -PdisablePreDex
     - cp -fr app/build/outputs $CIRCLE_ARTIFACTS
-    - cp -fr app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+    # - cp -fr app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
 
 deployment:
   deploygate:
