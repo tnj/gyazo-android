@@ -11,6 +11,7 @@ dependencies:
 
 test:
   override:
+    - ./gradlew :app:assembleDebug -PdisablePreDex
     - ./gradlew test -PdisablePreDex
     - cp -fr app/build/outputs $CIRCLE_ARTIFACTS
     # - cp -fr app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
@@ -19,4 +20,4 @@ deployment:
   deploygate:
     branch: master
     commands:
-      - ./gradlew :app:uploadDeployGateDebug -PdisablePreDex -PDEPLOYGATE_USER_NAME=$DEPLOYGATE_USER_NAME -PDEPLOYGATE_API_TOKEN=$DEPLOYGATE_API_TOKEN -PBUILD_MESSAGE=`git symbolic-ref --short HEAD`
+      - ./gradlew :app:uploadDeployGateDebug -PDEPLOYGATE_USER_NAME=$DEPLOYGATE_USER_NAME -PDEPLOYGATE_API_TOKEN=$DEPLOYGATE_API_TOKEN -PBUILD_MESSAGE=`git symbolic-ref --short HEAD`
