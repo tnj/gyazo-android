@@ -1,4 +1,4 @@
-package sh.nothing.gyazo;
+package sh.nothing.gyazo.activity;
 
 import android.app.Activity;
 import android.content.ContentUris;
