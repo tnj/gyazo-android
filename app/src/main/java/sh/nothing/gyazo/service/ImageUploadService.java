@@ -67,6 +67,8 @@ public class ImageUploadService extends IntentService {
 
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         clipboard.setText(url);
+        showToast(R.string.upload_successful, Toast.LENGTH_SHORT);
+
         DeployGate.logVerbose("Upload successful");
     }
 

@@ -7,4 +7,5 @@
     <string name="title_activity_main">Gyazo Android</string>
     <string name="failed_to_upload_image">Gyazoへのアップロードに失敗しました</string>
     <string name="uploading_image">Gyazoへアップロードしています</string>
+    <string name="upload_successful">URLをコピーしました</string>
 </resources>

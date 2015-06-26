@@ -60,6 +60,9 @@ if (project.hasProperty("DEPLOYGATE_USER_NAME")) {
         apks {
             debug {
                 sourceFile = file("build/outputs/apk/app-debug.apk")
+                if (project.hasProperty("BUILD_MESSAGE")) {
+                    message = BUILD_MESSAGE
+                }
             }
             release {
                 sourceFile = file("build/outputs/apk/app-release.apk")
