@@ -1,0 +1,26 @@
+machine:
+  environment:
+    ANDROID_HOME: /usr/local/android-sdk-linux
+    ADB_INSTALL_TIMEOUT: 8
+
+dependencies:
+  cache_directories:
+    - ~/.android
+  override:
+    - ./gradlew dependencies
+
+test:
+  override:
+    - emulator -avd circleci-android22 -no-audio -no-window:
+        background: true
+        parallel: true
+    - circle-android wait-for-boot
+    - ./gradlew connectedAndroidTest -PdisablePreDex
+    - cp -r app/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+
+deployment:
+  deploygate:
+    branch: master
+    commands:
+      - ./gradlew :app:uploadDeployGateDebug -PdisablePreDex -PDEPLOYGATE_USER_NAME=$DEPLOYGATE_USER_NAME -PDEPLOYGATE_API_TOKEN=$DEPLOYGATE_API_TOKEN -PBUILD_MESSAGE=`git symbolic-ref --short HEAD`
