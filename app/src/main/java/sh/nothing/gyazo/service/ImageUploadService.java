@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.deploygate.sdk.DeployGate;
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.MultipartBuilder;
@@ -49,6 +50,7 @@ public class ImageUploadService extends IntentService {
             result = upload(uri);
         } catch (IOException e) {
             Log.w(TAG, "Failed to upload an image", e);
+            DeployGate.logWarn("Failed to upload: " + e.getMessage());
         }
 
         if (result == null) {
@@ -65,10 +67,12 @@ public class ImageUploadService extends IntentService {
 
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         clipboard.setText(url);
+        DeployGate.logVerbose("Upload successful");
     }
 
     private void onFailed() {
         showToast(R.string.failed_to_upload_image, Toast.LENGTH_SHORT);
+        DeployGate.logWarn("Upload failed");
     }
 
     private void onStart() {
