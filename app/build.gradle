@@ -59,10 +59,10 @@ if (project.hasProperty("DEPLOYGATE_USER_NAME")) {
 
         apks {
             debug {
-                sourceFile = file("build/outputs/apk/gyazo-debug.apk")
+                sourceFile = file("build/outputs/apk/app-debug.apk")
             }
             release {
-                sourceFile = file("build/outputs/apk/gyazo-release.apk")
+                sourceFile = file("build/outputs/apk/app-release.apk")
                 if (project.hasProperty("BUILD_MESSAGE")) {
                     message = BUILD_MESSAGE
                 }
