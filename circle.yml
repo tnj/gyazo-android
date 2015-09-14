@@ -20,4 +20,4 @@ deployment:
   deploygate:
     branch: master
     commands:
-      - ./gradlew :app:uploadDeployGateDebug -PDEPLOYGATE_USER_NAME=$DEPLOYGATE_USER_NAME -PDEPLOYGATE_API_TOKEN=$DEPLOYGATE_API_TOKEN -PBUILD_MESSAGE=`git symbolic-ref --short HEAD`
+      - ./gradlew :app:uploadDeployGateDebug -PDEPLOYGATE_USER_NAME=$DEPLOYGATE_USER_NAME -PDEPLOYGATE_API_TOKEN=$DEPLOYGATE_API_TOKEN -PBUILD_MESSAGE="Branch: $(git symbolic-ref --short HEAD)\n$(git log --pretty=oneline --abbrev-commit HEAD@{1}..HEAD@{0})"
