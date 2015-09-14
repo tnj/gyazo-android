@@ -1,11 +1,13 @@
 machine:
   environment:
+    TERM: dumb
     ANDROID_HOME: /usr/local/android-sdk-linux
     ADB_INSTALL_TIMEOUT: 8
 
 dependencies:
   cache_directories:
     - ~/.android
+    - ~/.gradle
   override:
     - ./gradlew dependencies
 
@@ -20,4 +22,6 @@ deployment:
   deploygate:
     branch: master
     commands:
-      - ./gradlew :app:uploadDeployGateDebug -PDEPLOYGATE_USER_NAME=$DEPLOYGATE_USER_NAME -PDEPLOYGATE_API_TOKEN=$DEPLOYGATE_API_TOKEN -PBUILD_MESSAGE="Branch: $(git symbolic-ref --short HEAD)\n$(git log --pretty=oneline --abbrev-commit HEAD@{1}..HEAD@{0})"
+      - |
+        ./gradlew :app:uploadDeployGateDebug -PDEPLOYGATE_USER_NAME=$DEPLOYGATE_USER_NAME -PDEPLOYGATE_API_TOKEN=$DEPLOYGATE_API_TOKEN -PBUILD_MESSAGE="Branch=`git symbolic-ref --short HEAD`
+        `git log --pretty=oneline --abbrev-commit -1`"
